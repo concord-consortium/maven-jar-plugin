@@ -19,25 +19,25 @@ package org.apache.maven.plugin.jar;
  * under the License.
  */
 
-import org.apache.commons.lang.SystemUtils;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.StreamConsumer;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import org.apache.commons.lang.SystemUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.cli.CommandLineException;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.cli.Commandline;
+import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**
  * Signs a JAR using jarsigner.
@@ -156,6 +156,14 @@ public class JarSignMojo
      */
     private boolean verify;
 
+    /**
+     * See <a href="http://docs.oracle.com/javase/1.5.0/docs/tooldocs/windows/jarsigner.html#Options">options</a>.
+     * The corresponding option in the command line is -tsa.
+     *
+     * @parameter expression="${tsa}"
+     */
+    private String tsa;
+    
     /**
      * Skip attaching the signed artifact. By default the signed artifact is attached.
      * This is not a Mojo parameter as we shouldn't need this when using this mojo.
@@ -279,6 +287,7 @@ public class JarSignMojo
         // I believe Commandline to add quotes where appropriate, although I haven't tested it enough.
         // FIXME addArgIfNotEmpty will break those parameters containing a space.
         // Look at webapp:gen-keystore for a way to fix that
+        addArgIfNotEmpty( arguments, "-tsa", this.tsa);
         addArgIfNotEmpty( arguments, "-keystore", this.keystore );
         addArgIfNotEmpty( arguments, "-storepass", this.storepass );
         addArgIfNotEmpty( arguments, "-keypass", this.keypass );
@@ -541,6 +550,11 @@ public class JarSignMojo
     public void setAlias( String alias )
     {
         this.alias = alias;
+    }
+
+    public void setTsa( String tsa )
+    {
+        this.tsa = tsa;
     }
 
     // hiding for now - I don't think this is required to be seen
